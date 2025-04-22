@@ -25,8 +25,8 @@ This project develops an AI-driven system to classify crop health (Healthy vs. D
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/your-username/crop-quality-analysis.git
-   cd crop-quality-analysis
+   git clone https://github.com/Amith-S28/Health-of-a-Plant.git
+   cd Health-of-a-Plant
    ```
 
 2. **Set Up a Virtual Environment** (optional but recommended):
