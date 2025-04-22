@@ -39,7 +39,7 @@ This project develops an AI-driven system to classify crop health (Healthy vs. D
 3. **Install Dependencies**:
 
    ```bash
-   pip install -r requirements.txt
+   pip install tensorflow>=2.10.0 opencv-python>=4.5.5 pandas>=1.5.0 scikit-learn>=1.2.0 numpy>=1.23.0
    ```
 
    Requirements include:
