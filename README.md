@@ -1,124 +1,238 @@
-# Health-of-a-Plant-
-AI model used to know the health of a plant based on picture of its leaf
+AI-Powered Crop Quality Analysis Using Vision Systems
 
-What does the code do?
-This code:
+Overview
 
-Trains a CNN model to classify plant leaves as "Healthy" or "Diseased" using images from the PlantVillage dataset.
-Saves the trained model to avoid retraining every time.
-Uses a webcam to capture live images of leaves and classify them in real-time as "Healthy" or "Diseased."
-Displays the classification result on the webcam feed.
-Key Libraries Used
-OpenCV (cv2): For capturing webcam images, resizing, and displaying results.
-NumPy (np): For handling arrays (images are stored as arrays).
-TensorFlow/Keras (tf, tensorflow.keras): For building, training, and using the CNN model.
-Pandas (pd): For organizing the dataset (image paths and labels).
-Scikit-learn (sklearn): For splitting the dataset into training and validation sets.
-OS, Signal, Sys: For handling file paths, graceful shutdown, and system operations.
-Main Components of the Code
+This project develops an AI-driven system to classify crop health (Healthy vs. Diseased) using computer vision and deep learning. Leveraging a large agricultural image dataset, the system employs a Convolutional Neural Network (CNN) and explores transfer learning with advanced pre-trained models to enhance feature detection. It includes real-time analysis capabilities through camera integration, displaying crop health status dynamically. The project aims to advance precision agriculture by automating crop quality assessment, improving scalability and accuracy over traditional methods.
 
-1. Graceful Shutdown (Signal Handler)
-What it does: If you press Ctrl+C to stop the program, it cleanly closes the webcam and windows without crashing.
-How it works:
-A global variable shutdown tracks whether the program should stop.
-The signal_handler function is triggered when Ctrl+C is pressed. It releases the webcam (cap.release()), closes all OpenCV windows (cv2.destroyAllWindows()), and exits the program.
-Why it’s useful: Prevents the program from freezing or leaving resources (like the webcam) open.
-Viva Tip: If asked, say, "The signal handler ensures the program shuts down gracefully when interrupted, releasing resources like the webcam to avoid crashes."
+Features
 
-2. Creating the CNN Model (create_cnn_model)
-What it does: Builds a CNN model to classify images as "Healthy" or "Diseased."
-How it works:
-The model has 3 convolutional layers (with 32, 64, and 128 filters) to extract features like edges and patterns from images.
-Each convolutional layer is followed by a MaxPooling layer to reduce image size while keeping important features.
-The output is flattened into a 1D array, passed through a Dense layer (128 neurons), and finally to a single neuron with a sigmoid activation to output a probability (0 = Diseased, 1 = Healthy).
-The model uses the Adam optimizer and binary crossentropy loss (suitable for binary classification).
-Input shape: Images are resized to 128x128 pixels with 3 color channels (RGB).
-Viva Tip: Explain, "The CNN model has convolutional layers to detect features in leaf images, max-pooling to reduce size, and dense layers to classify the leaf as Healthy or Diseased based on a probability score."
 
-3. Preprocessing Images (preprocess_image)
-What it does: Prepares an image for the CNN model.
-How it works:
-Resizes the image to 128x128 pixels (same as the model’s input shape).
-Converts the image from BGR (OpenCV’s default format) to RGB (Keras expects RGB).
-Normalizes pixel values to the range [0, 1] by dividing by 255.
-Adds an extra dimension to the image (to match the model’s expected input format: (1, 128, 128, 3)).
-Why it’s needed: The model requires images in a specific format to make predictions.
-Viva Tip: Say, "The preprocess_image function resizes the image, converts it to RGB, normalizes it, and prepares it for the CNN model to predict whether the leaf is Healthy or Diseased."
 
-4. Classifying Crops (classify_crop)
-What it does: Uses the trained model to classify a leaf image as "Healthy" or "Diseased."
-How it works:
-Takes an image, preprocesses it, and feeds it to the model.
-The model outputs a probability (0 to 1). If it’s > 0.5, the leaf is "Healthy"; otherwise, it’s "Diseased."
-Output: A string ("Healthy" or "Diseased").
-Viva Tip: Explain, "This function uses the trained CNN to predict if a leaf is Healthy or Diseased based on the model’s output probability."
 
-5. Loading the PlantVillage Dataset (load_plantvillage_dataset)
-What it does: Loads images from the PlantVillage dataset and prepares them for training.
-How it works:
-The dataset is stored in a folder (dataset_dir), with subfolders for each class (e.g., "Tomato_Healthy," "Tomato_Bacterial_spot").
-The code scans the folder, creates a list of image paths, and assigns labels ("Healthy" if the folder name contains "healthy," otherwise "Diseased").
-Uses Pandas to create a DataFrame with image paths and labels.
-Splits the data into 80% training and 20% validation sets using train_test_split.
-Uses ImageDataGenerator to:
-Rescale images (divide pixel values by 255).
-Apply data augmentation (random rotations, flips, shifts) to the training set to make the model robust.
-Load images in batches (32 images at a time) for efficient training.
-Returns train_generator and val_generator (for training and validation) and the sizes of the datasets.
-Viva Tip: Say, "This function loads the PlantVillage dataset, organizes images with labels, splits them into training and validation sets, and applies data augmentation to improve model performance."
 
-6. Main Function (main)
-This is the heart of the program, tying everything together. Let’s break it down step-by-step:
+Crop Health Classification: Classifies crops as Healthy or Diseased using deep learning models.
 
-Setup Signal Handler:
-Ensures the program can be stopped gracefully with Ctrl+C.
-Define Paths:
-dataset_dir: Path to the PlantVillage dataset.
-model_dir: Where the trained model will be saved.
-model_path: Path for the final trained model.
-checkpoint_path: Path to save the best model during training.
-partial_path: Path to save a partially trained model if training is interrupted.
-Check for Existing Model:
-If a trained model exists at model_path, it loads it using load_model.
-If not, it trains a new model.
-Training a New Model:
-Calls load_plantvillage_dataset to prepare the dataset.
-Creates a new CNN model with create_cnn_model.
-Uses a ModelCheckpoint callback to save the best model (based on validation loss) during training.
-Trains the model for 10 epochs (passes through the dataset).
-If interrupted (e.g., by Ctrl+C), saves a partial model to partial_path.
-Saves the final trained model to model_path.
-Real-Time Webcam Analysis:
-Opens the webcam using cv2.VideoCapture(0).
-Captures frames in a loop until the program is stopped.
-For each frame:
-Calls classify_crop to predict if the leaf is "Healthy" or "Diseased."
-Displays the result on the frame using cv2.putText (green text for "Healthy," red for "Diseased").
-Shows the frame in a window named "Crop Quality Analysis."
-Pressing q or triggering shutdown stops the loop.
-Releases the webcam and closes windows when done.
-Viva Tip: Explain, "The main function checks if a trained model exists. If not, it trains a new one using the PlantVillage dataset. Then, it uses the webcam to capture leaf images, classifies them as Healthy or Diseased, and displays the result live."
 
-How It All Works Together
-The program starts by checking if a trained model exists. If not, it trains one using the PlantVillage dataset.
-During training, it processes images, applies data augmentation, and saves the best model.
-Once trained (or loaded), it uses the webcam to capture live images of leaves.
-Each image is preprocessed, classified by the CNN, and the result is shown on the screen.
-The program stops cleanly if you press q or Ctrl+C.
-Common Viva Questions and Answers
-What is the purpose of this code?
-It classifies plant leaves as Healthy or Diseased using a CNN model trained on the PlantVillage dataset and performs real-time analysis with a webcam.
-What is a CNN, and why is it used here?
-A Convolutional Neural Network (CNN) is a deep learning model designed for image processing. It’s used here because it can detect patterns (like disease spots) in leaf images effectively.
-Why do you preprocess images?
-Images are preprocessed to resize them, convert to RGB, normalize pixel values, and match the model’s input format for accurate predictions.
-What is data augmentation, and why is it used?
-Data augmentation applies random changes (like rotations, flips) to training images to make the model robust to variations in real-world images.
-How does the webcam part work?
-The webcam captures live images, which are preprocessed and fed to the CNN model. The model predicts if the leaf is Healthy or Diseased, and the result is displayed on the screen.
-What happens if the program is interrupted during training?
-If interrupted, the program saves a partially trained model to avoid losing progress and shuts down gracefully.
-Why save the model?
-Saving the model allows reusing it without retraining, which saves time since training is computationally expensive.
-What is the PlantVillage dataset?
-It’s a dataset of plant leaf images labeled as healthy or diseased, used to train the model to recognize plant conditions.
+
+Baseline CNN: A custom CNN for binary classification, optimized for the dataset.
+
+
+
+Transfer Learning: Experiments with advanced models (e.g., EfficientNetB0, VGG16) to improve feature extraction.
+
+
+
+Real-Time Analysis: Integrates with a webcam to display crop health status in real-time.
+
+
+
+Image Preprocessing: Applies resizing, normalization, and data augmentation for robust model training.
+
+Technologies
+
+
+
+
+
+Python: Core programming language.
+
+
+
+Deep Learning Frameworks: TensorFlow for model development and training.
+
+
+
+Computer Vision Libraries: OpenCV for image processing and real-time analysis.
+
+
+
+Data Processing Tools: Pandas, Scikit-learn for dataset handling and splitting.
+
+
+
+Dataset: A large agricultural image dataset (e.g., PlantVillage with 54,306 images).
+
+Installation
+
+
+
+
+
+Clone the Repository:
+
+git clone https://github.com/your-username/crop-quality-analysis.git
+cd crop-quality-analysis
+
+
+
+Set Up a Virtual Environment (optional but recommended):
+
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+
+
+Install Dependencies:
+
+pip install -r requirements.txt
+
+Requirements include:
+
+
+
+
+
+tensorflow>=2.10.0
+
+
+
+opencv-python>=4.5.5
+
+
+
+pandas>=1.5.0
+
+
+
+scikit-learn>=1.2.0
+
+
+
+numpy>=1.23.0
+
+
+
+Download the Dataset:
+
+
+
+
+
+Obtain the PlantVillage dataset (or similar agricultural dataset) and place it in a directory (e.g., data/plantvillage/color/).
+
+
+
+Update the dataset_dir path in the script to point to this directory.
+
+Usage
+
+
+
+
+
+Prepare the Dataset:
+
+
+
+
+
+Ensure the dataset is organized in subdirectories by class (e.g., Apple___healthy, Apple___Black_rot).
+
+
+
+The script automatically labels images as "Healthy" or "Diseased" based on folder names.
+
+
+
+Run the Script:
+
+python crop_quality_analysis_plantvillage.py
+
+
+
+
+
+If a pre-trained model exists, it will load and start real-time analysis.
+
+
+
+Otherwise, it will train a new CNN model and save it for future use.
+
+
+
+Real-Time Analysis:
+
+
+
+
+
+Connect a webcam to your device.
+
+
+
+The script will display a live feed with crop health status ("Healthy" or "Diseased") overlaid.
+
+
+
+Press q to exit the webcam feed.
+
+
+
+Model Training:
+
+
+
+
+
+The script trains a CNN from scratch if no model is found.
+
+
+
+To experiment with transfer learning models (e.g., EfficientNetB0), modify the script to include the desired model (see code comments).
+
+Project Structure
+
+crop-quality-analysis/
+├── crop_quality_analysis_plantvillage.py  # Main script for training and real-time analysis
+├── data/                                 # Directory for dataset (e.g., PlantVillage)
+├── models/                               # Directory for saved models and checkpoints
+├── requirements.txt                      # Python dependencies
+└── README.md                             # This file
+
+Results
+
+
+
+
+
+Baseline CNN: Achieved high accuracy on the dataset, demonstrating effectiveness for binary classification.
+
+
+
+Transfer Learning Models: Explored advanced models, with varying performance due to fine-tuning and preprocessing challenges.
+
+
+
+Real-Time Capability: Successfully classifies crop health in real-time using webcam input.
+
+Limitations
+
+
+
+
+
+Limited to leaf-based analysis; may not generalize to fruits or whole plants.
+
+
+
+Advanced models require careful fine-tuning and proper input resolution for optimal performance.
+
+
+
+Real-time analysis may lag on low-end devices without optimization.
+
+Future Work
+
+
+
+
+
+Integrate multi-modal data (e.g., multispectral imaging) for enhanced analysis.
+
+
+
+Develop cross-crop models for broader applicability.
+
+
+
+Optimize models for edge devices (e.g., Raspberry Pi) using quantization or lightweight architectures.
