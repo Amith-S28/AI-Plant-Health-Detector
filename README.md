@@ -25,8 +25,8 @@ This project develops an AI-driven system to classify crop health (Healthy vs. D
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/Amith-S28/Health-of-a-Plant.git
-   cd Health-of-a-Plant
+   git clone https://github.com/Amith-S28/AI-Plant-Health-Detector.git
+   cd AI-Plant-Health-Detector
    ```
 
 2. **Set Up a Virtual Environment** (optional but recommended):
@@ -87,9 +87,7 @@ This project develops an AI-driven system to classify crop health (Healthy vs. D
 ```
 crop-quality-analysis/
 ├── crop_quality_analysis_plantvillage.py  # Main script for training and real-time analysis
-├── data/                                 # Directory for dataset (e.g., PlantVillage)
-├── models/                               # Directory for saved models and checkpoints
-├── requirements.txt                      # Python dependencies
+├── AIRP.docx                                  # Research Paper of this project
 └── README.md                             # This file
 ```
 
